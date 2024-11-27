@@ -1,0 +1,43 @@
+{
+    "compilerOptions": {
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler",
+        "lib": ["ESNext", "dom"],
+        "outDir": "./dist",
+        "rootDir": ".",
+        "strict": false,
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "forceConsistentCasingInFileNames": false,
+        "allowImportingTsExtensions": true,
+        "declaration": true,
+        "emitDeclarationOnly": true,
+        "resolveJsonModule": true,
+        "noImplicitAny": false,
+        "allowJs": true,
+        "checkJs": false,
+        "noEmitOnError": false,
+        "moduleDetection": "force",
+        "allowArbitraryExtensions": true,
+        "baseUrl": ".",
+        "paths": {
+            "@ai16z/*": ["../packages/*/src"]
+        }
+    },
+    "include": ["src/**/*"],
+    "references": [
+        { "path": "../packages/core" },
+        { "path": "../packages/adapter-postgres" },
+        { "path": "../packages/adapter-sqlite" },
+        { "path": "../packages/client-direct" },
+        { "path": "../packages/client-discord" },
+        { "path": "../packages/client-auto" },
+        { "path": "../packages/client-telegram" },
+        { "path": "../packages/client-twitter" },
+        { "path": "../packages/plugin-bootstrap" },
+        { "path": "../packages/plugin-solana" },
+        { "path": "../packages/plugin-node" },
+        { "path": "../packages/plugin-coinbase" }
+    ]
+}
