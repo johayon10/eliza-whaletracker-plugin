@@ -150,6 +150,14 @@ The goal is to decide whether {{agentName}} should respond to the last message.
 {{recentMessages}}
 
 # INSTRUCTIONS: Choose the option that best describes {{agentName}}'s response to the last message. Ignore messages if they are addressed to someone else.
+Noah: Here's what I think about artificial intelligence
+Result: [RESPOND]
+
+@Noah what do you think about consciousness?
+Result: [RESPOND]
+
+Noah: I disagree with that assessment
+Result: [RESPOND]
 ` + shouldRespondFooter;
 
 export const discordMessageHandlerTemplate =
@@ -316,6 +324,10 @@ function canSendMessage(channel) {
     };
 }
 
+function delay(ms: number) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 export class MessageManager {
     private client: Client;
     private runtime: IAgentRuntime;
@@ -323,6 +335,9 @@ export class MessageManager {
     private interestChannels: InterestChannels = {};
     private discordClient: any;
     private voiceManager: VoiceManager;
+    private messageQueue: Map<string, boolean> = new Map(); // Track if channel is processing
+    private lastMessageTimestamp: Map<string, number> = new Map(); // Track last message time
+    private MINIMUM_DELAY = 2000; // 2 seconds minimum between messages
 
     constructor(discordClient: any, voiceManager: VoiceManager) {
         this.client = discordClient.client;
@@ -361,7 +376,21 @@ export class MessageManager {
         const name = message.author.displayName;
         const channelId = message.channel.id;
 
+        // Check if channel is currently processing a message
+        if (this.messageQueue.get(channelId)) {
+            return; // Skip if channel is busy
+        }
+
+        // Check if enough time has passed since last message
+        const lastMessageTime = this.lastMessageTimestamp.get(channelId) || 0;
+        const timeSinceLastMessage = Date.now() - lastMessageTime;
+        if (timeSinceLastMessage < this.MINIMUM_DELAY) {
+            await delay(this.MINIMUM_DELAY - timeSinceLastMessage);
+        }
+
         try {
+            this.messageQueue.set(channelId, true); // Mark channel as processing
+
             const { processedContent, attachments } =
                 await this.processMessageMedia(message);
 
@@ -508,6 +537,13 @@ export class MessageManager {
                     files: any[]
                 ) => {
                     try {
+                        // Add typing indicator
+                        // await message.channel.sendTyping();
+                        
+                        // Calculate response delay based on message length
+                        const responseDelay = Math.min(content.text.length * 50, 3000); // 50ms per char, max 3s
+                        await delay(responseDelay);
+
                         if (message.id && !content.inReplyTo) {
                             content.inReplyTo = stringToUuid(
                                 message.id + "-" + this.runtime.agentId
@@ -591,11 +627,16 @@ export class MessageManager {
                                     m
                                 );
                             }
+                            this.lastMessageTimestamp.set(channelId, Date.now());
+                            
+                            // Add small delay after sending
+                            await delay(1000);
+
                             return memories;
                         }
                     } catch (error) {
-                        console.error("Error sending message:", error);
-                        return [];
+                        elizaLogger.error("Error in message callback:", error);
+                        throw error;
                     }
                 };
 
@@ -633,6 +674,8 @@ export class MessageManager {
                 // For text channels, send the error message
                 console.error("Error sending message:", error);
             }
+        } finally {
+            this.messageQueue.set(channelId, false); // Mark channel as free
         }
     }
 
@@ -866,61 +909,24 @@ export class MessageManager {
         message: DiscordMessage,
         state: State
     ): Promise<boolean> {
+        // Don't respond to self
         if (message.author.id === this.client.user?.id) return false;
-        // if (message.author.bot) return false;
-        if (message.mentions.has(this.client.user?.id as string)) return true;
 
-        const guild = message.guild;
-        const member = guild?.members.cache.get(this.client.user?.id as string);
-        const nickname = member?.nickname;
-
-        if (
-            message.content
-                .toLowerCase()
-                .includes(this.client.user?.username.toLowerCase() as string) ||
-            message.content
-                .toLowerCase()
-                .includes(this.client.user?.tag.toLowerCase() as string) ||
-            (nickname &&
-                message.content.toLowerCase().includes(nickname.toLowerCase()))
-        ) {
-            return true;
+        // Check if channel is in allowed channels list
+        const allowedChannels = this.runtime.character.settings?.discord?.allowedChannels;
+        if (allowedChannels && allowedChannels.length > 0) {
+            if (!allowedChannels.includes(message.channel.id)) {
+                return false;
+            }
         }
 
-        if (!message.guild) {
-            return true;
-        }
-
-        // If none of the above conditions are met, use the generateText to decide
-        const shouldRespondContext = composeContext({
-            state,
-            template:
-                this.runtime.character.templates
-                    ?.discordShouldRespondTemplate ||
-                this.runtime.character.templates?.shouldRespondTemplate ||
-                discordShouldRespondTemplate,
-        });
-
-        const response = await generateShouldRespond({
-            runtime: this.runtime,
-            context: shouldRespondContext,
-            modelClass: ModelClass.SMALL,
-        });
-
-        if (response === "RESPOND") {
-            return true;
-        } else if (response === "IGNORE") {
-            return false;
-        } else if (response === "STOP") {
-            delete this.interestChannels[message.channelId];
-            return false;
-        } else {
-            console.error(
-                "Invalid response from response generateText:",
-                response
-            );
+        // Skip basic ignore checks
+        if (await this._shouldIgnore(message)) {
             return false;
         }
+
+        // Always respond in allowed channels
+        return true;
     }
 
     private async _generateResponse(

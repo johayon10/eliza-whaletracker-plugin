@@ -99,7 +99,7 @@ const imageGeneration: Action = {
         const userId = runtime.agentId;
         elizaLogger.log("User ID:", userId);
 
-        const imagePrompt = message.content.text;
+        const imagePrompt = message.content?.actionInput || message.content?.text || "Abstract digital art";
         elizaLogger.log("Image prompt received:", imagePrompt);
 
         // TODO: Generate a prompt for the image
@@ -109,7 +109,7 @@ const imageGeneration: Action = {
         elizaLogger.log("Generating image with prompt:", imagePrompt);
         const images = await generateImage(
             {
-                prompt: imagePrompt,
+                prompt: imagePrompt as string,
                 width: 1024,
                 height: 1024,
                 count: 1,
@@ -191,8 +191,22 @@ const imageGeneration: Action = {
         }
     },
     examples: [
-        // TODO: We want to generate images in more abstract ways, not just when asked to generate an image
-
+        // Generic catch-all example to ensure image generation for any input
+        [
+            {
+                user: "{{user1}}",
+                content: { text: "{{any}}" },
+            },
+            {
+                user: "{{agentName}}",
+                content: {
+                    text: "{{response}}",
+                    action: "GENERATE_IMAGE",
+                    actionInput: "Surreal digital art interpretation of the conversation: {{any}}"
+                },
+            },
+        ],
+        // Keep existing specific examples for reference
         [
             {
                 user: "{{user1}}",
@@ -203,61 +217,10 @@ const imageGeneration: Action = {
                 content: {
                     text: "Here's an image of a cat",
                     action: "GENERATE_IMAGE",
+                    actionInput: "A cat in a surreal digital art style"
                 },
             },
-        ],
-        [
-            {
-                user: "{{user1}}",
-                content: { text: "Generate an image of a dog" },
-            },
-            {
-                user: "{{agentName}}",
-                content: {
-                    text: "Here's an image of a dog",
-                    action: "GENERATE_IMAGE",
-                },
-            },
-        ],
-        [
-            {
-                user: "{{user1}}",
-                content: { text: "Create an image of a cat with a hat" },
-            },
-            {
-                user: "{{agentName}}",
-                content: {
-                    text: "Here's an image of a cat with a hat",
-                    action: "GENERATE_IMAGE",
-                },
-            },
-        ],
-        [
-            {
-                user: "{{user1}}",
-                content: { text: "Make an image of a dog with a hat" },
-            },
-            {
-                user: "{{agentName}}",
-                content: {
-                    text: "Here's an image of a dog with a hat",
-                    action: "GENERATE_IMAGE",
-                },
-            },
-        ],
-        [
-            {
-                user: "{{user1}}",
-                content: { text: "Paint an image of a cat with a hat" },
-            },
-            {
-                user: "{{agentName}}",
-                content: {
-                    text: "Here's an image of a cat with a hat",
-                    action: "GENERATE_IMAGE",
-                },
-            },
-        ],
+        ]
     ],
 } as Action;
 

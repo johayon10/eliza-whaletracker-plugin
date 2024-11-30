@@ -85,8 +85,6 @@ export async function loadCharacters(
                 const character = JSON.parse(fs.readFileSync(path, "utf8"));
                 validateCharacterConfig(character);
 
-                character.plugins = [];
-
                 loadedCharacters.push(character);
             } catch (e) {
                 console.error(`Error loading character from ${path}: ${e}`);
@@ -318,22 +316,10 @@ const startAgents = async () => {
         for (const character of characters) {
             await startAgent(character, directClient as DirectClient);
         }
+        elizaLogger.log("Discord bot started and ready to chat!");
     } catch (error) {
         elizaLogger.error("Error starting agents:", error);
     }
-
-    function chat() {
-        const agentId = characters[0].name ?? "Agent";
-        rl.question("You: ", async (input) => {
-            await handleUserInput(input, agentId);
-            if (input.toLowerCase() !== "exit") {
-                chat(); // Loop back to ask another question
-            }
-        });
-    }
-
-    elizaLogger.log("Chat started. Type 'exit' to quit.");
-    chat();
 };
 
 startAgents().catch((error) => {
@@ -351,7 +337,7 @@ rl.on("SIGINT", () => {
     process.exit(0);
 });
 
-async function handleUserInput(input, agentId) {
+async function handleUserInput(input: string, agentId: string) {
     if (input.toLowerCase() === "exit") {
         rl.close();
         process.exit(0);
@@ -370,18 +356,18 @@ async function handleUserInput(input, agentId) {
                     text: input,
                     userId: "user",
                     userName: "User",
-                    content: {  // Add content wrapper
+                    content: {
                         text: input,
                         action: "GENERATE_IMAGE",
-                        actionInput: "Surreal digital art of a glowing computer terminal with matrix code"
-                    }
+                        actionInput: `Surreal digital art interpretation: ${input}`,
+                    },
                 }),
             }
         );
 
         const data = await response.json();
-        data.forEach((message) => {
-            console.log(`${"Agent"}: ${message.text}`);
+        data.forEach((message: any) => {
+            console.log(`Agent: ${message.text}`);
             
             // Log all message properties for debugging
             console.log("Message content:", message.content);
@@ -400,7 +386,7 @@ async function handleUserInput(input, agentId) {
 
             // Check for attachments
             if (message.attachments?.length > 0) {
-                message.attachments.forEach(attachment => {
+                message.attachments.forEach((attachment: any) => {
                     console.log(`Generated Image: ${attachment.url}`);
                 });
             }
@@ -409,3 +395,4 @@ async function handleUserInput(input, agentId) {
         console.error("Error fetching response:", error);
     }
 }
+
