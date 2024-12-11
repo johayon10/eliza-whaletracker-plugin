@@ -35,8 +35,9 @@ import { fileURLToPath } from "url";
 import { character } from "./character.ts";
 import type { DirectClient } from "@ai16z/client-direct";
 import { imageGenerationPlugin } from "@ai16z/plugin-image-generation";
+import { whaleTrackerPlugin } from "@ai16z/plugin-whaletracker";
 
-const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
+const __filename = fileURLToPath( import.meta.url); // get the resolved path to the file
 const __dirname = path.dirname(__filename); // get the name of the directory
 
 export const wait = (minTime: number = 1000, maxTime: number = 3000) => {
@@ -233,6 +234,7 @@ export async function createAgent(
         process.env.COINBASE_COMMERCE_KEY
             ? coinbaseCommercePlugin
             : null,
+        whaleTrackerPlugin,
     ].filter(Boolean);
 
     console.log(
