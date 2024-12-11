@@ -36,6 +36,7 @@
         "@ai16z/plugin-solana": "workspace:*",
         "@ai16z/plugin-starknet": "workspace:*",
         "@ai16z/plugin-coinbase": "workspace:*",
+        "@ai16z/plugin-whaletracker": "workspace:*",
         "better-sqlite3": "^9.4.3",
         "readline": "^1.3.0",
         "ws": "^8.18.0",

@@ -52,4 +52,3 @@ export async function validateImageGenConfig(
         throw error;
     }
 }
-            

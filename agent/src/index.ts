@@ -235,7 +235,10 @@ export async function createAgent(
             : null,
     ].filter(Boolean);
 
-    console.log("Loading plugins:", plugins.map(p => p.name));
+    console.log(
+        "Loading plugins:",
+        plugins.map((p) => p.name)
+    );
 
     return new AgentRuntime({
         databaseAdapter: db,
@@ -368,11 +371,11 @@ async function handleUserInput(input: string, agentId: string) {
         const data = await response.json();
         data.forEach((message: any) => {
             console.log(`Agent: ${message.text}`);
-            
+
             // Log all message properties for debugging
             console.log("Message content:", message.content);
             console.log("Message attachments:", message.attachments);
-            
+
             // Check for image generation in message
             if (message.content?.action === "GENERATE_IMAGE") {
                 console.log("Generating image...");
@@ -380,7 +383,9 @@ async function handleUserInput(input: string, agentId: string) {
                     console.log(`Image Prompt: ${message.content.actionInput}`);
                 }
                 if (message.content.imageUrl) {
-                    console.log(`Generated Image URL: ${message.content.imageUrl}`);
+                    console.log(
+                        `Generated Image URL: ${message.content.imageUrl}`
+                    );
                 }
             }
 
@@ -395,4 +400,3 @@ async function handleUserInput(input: string, agentId: string) {
         console.error("Error fetching response:", error);
     }
 }
-

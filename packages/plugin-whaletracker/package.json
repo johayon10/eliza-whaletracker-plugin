@@ -1,0 +1,27 @@
+{
+    "name": "@ai16z/plugin-whaletracker",
+    "version": "0.0.1",
+    "main": "dist/index.mjs",
+    "types": "dist/index.d.mts",
+    "type": "module",
+    "scripts": {
+        "build": "tsup",
+        "dev": "tsup --watch",
+        "clean": "rm -rf dist"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "description": "",
+    "dependencies": {
+        "@ai16z/eliza": "workspace:*",
+        "@anthropic-ai/sdk": "^0.18.0",
+        "@solana/web3.js": "^1.91.0",
+        "axios": "^1.6.7"
+    },
+    "devDependencies": {
+        "@types/node": "^22.10.1",
+        "tsup": "^8.0.0",
+        "typescript": "^5.7.2"
+    }
+}

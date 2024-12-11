@@ -130,6 +130,14 @@ Result: [STOP]
 {{user1}}: great. okay, now do it again
 Result: [RESPOND]
 
+Noah: Here's what I think about artificial intelligence
+Result: [RESPOND]
+
+@Noah what do you think about consciousness?
+Result: [RESPOND]
+
+Noah: I disagree with that assessment
+Result: [RESPOND]
 Response options are [RESPOND], [IGNORE] and [STOP].
 
 {{agentName}} is in a room with other users and should only respond when they are being addressed, and should not respond if they are continuing a conversation that is very long.
@@ -150,14 +158,7 @@ The goal is to decide whether {{agentName}} should respond to the last message.
 {{recentMessages}}
 
 # INSTRUCTIONS: Choose the option that best describes {{agentName}}'s response to the last message. Ignore messages if they are addressed to someone else.
-Noah: Here's what I think about artificial intelligence
-Result: [RESPOND]
 
-@Noah what do you think about consciousness?
-Result: [RESPOND]
-
-Noah: I disagree with that assessment
-Result: [RESPOND]
 ` + shouldRespondFooter;
 
 export const discordMessageHandlerTemplate =
@@ -325,7 +326,7 @@ function canSendMessage(channel) {
 }
 
 function delay(ms: number) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 export class MessageManager {
@@ -539,9 +540,12 @@ export class MessageManager {
                     try {
                         // Add typing indicator
                         // await message.channel.sendTyping();
-                        
+
                         // Calculate response delay based on message length
-                        const responseDelay = Math.min(content.text.length * 50, 3000); // 50ms per char, max 3s
+                        const responseDelay = Math.min(
+                            content.text.length * 50,
+                            3000
+                        ); // 50ms per char, max 3s
                         await delay(responseDelay);
 
                         if (message.id && !content.inReplyTo) {
@@ -627,8 +631,11 @@ export class MessageManager {
                                     m
                                 );
                             }
-                            this.lastMessageTimestamp.set(channelId, Date.now());
-                            
+                            this.lastMessageTimestamp.set(
+                                channelId,
+                                Date.now()
+                            );
+
                             // Add small delay after sending
                             await delay(1000);
 
@@ -913,7 +920,8 @@ export class MessageManager {
         if (message.author.id === this.client.user?.id) return false;
 
         // Check if channel is in allowed channels list
-        const allowedChannels = this.runtime.character.settings?.discord?.allowedChannels;
+        const allowedChannels =
+            this.runtime.character.settings?.discord?.allowedChannels;
         if (allowedChannels && allowedChannels.length > 0) {
             if (!allowedChannels.includes(message.channel.id)) {
                 return false;

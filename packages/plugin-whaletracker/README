@@ -1,0 +1,80 @@
+# Solana Trading Bot
+
+## Description
+
+A real-time trading bot that monitors Solana wallet transactions and uses Claude AI to analyze market data and identify trading opportunities. The bot tracks DEX swaps, token transfers, and trading patterns across multiple wallets to detect emerging trends.
+
+## Features
+
+-   Real-time transaction monitoring
+-   DEX swap detection and analysis
+-   Multi-wallet tracking
+-   AI-powered trading signals
+-   Market data integration with Birdeye
+-   Configurable analysis intervals
+-   Transaction pattern recognition
+
+## Prerequisites
+
+-   Node.js (v16 or higher)
+-   npm or yarn
+-   Solana wallet
+-   Required API keys:
+    -   Helius API key (for Solana data)
+    -   Anthropic API key (for AI analysis)
+    -   Birdeye API key (for market data)
+
+## Installation
+
+1. Clone the repository:
+
+2. Install dependencies:
+   npm install
+   npm install @solana/web3.js @anthropic-ai/sdk axios dotenv typescript ts-node
+   npm run build
+   npm run dev
+
+3. Create a `.env` file in the root directory:
+   API Keys
+   HELIUS_API_KEY=your_helius_api_key
+   ANTHROPIC_API_KEY=your_anthropic_api_key
+   BIRDEYE_API_KEY=your_birdeye_api_key
+   RPC Endpoint
+   RPC_ENDPOINT=https://mainnet.helius-rpc.com/
+
+## The bot will:
+
+-   Monitor specified wallet addresses
+-   Track transactions in real-time
+-   Analyze trading patterns
+-   Generate trading signals based on AI analysis
+-   Log analysis and decisions to the console
+
+## Monitoring Output
+
+The bot provides several types of output:
+
+-   Transaction processing logs
+-   Wallet activity summaries
+-   Token analysis
+-   AI trading decisions
+
+Example output:
+
+=== Starting new fetch cycle ===
+Time: 2024-12-09 05:30:57
+=== New Transaction Processed ===
+{
+type: "SWAP",
+wallet: "D4zVhwuU...",
+token: "FDJo7iMc...",
+amount: 155744.810624,
+time: "2024-12-09T05:11:45.000Z"
+}
+=== AI Trading Decision ===
+{
+"action": "buy",
+"token": "FDJo7iMc...",
+"confidence": 0.95,
+"reasoning": "Strong accumulation pattern detected"
+}

@@ -99,7 +99,10 @@ const imageGeneration: Action = {
         const userId = runtime.agentId;
         elizaLogger.log("User ID:", userId);
 
-        const imagePrompt = message.content?.actionInput || message.content?.text || "Abstract digital art";
+        const imagePrompt =
+            message.content?.actionInput ||
+            message.content?.text ||
+            "Abstract digital art";
         elizaLogger.log("Image prompt received:", imagePrompt);
 
         // TODO: Generate a prompt for the image
@@ -202,7 +205,8 @@ const imageGeneration: Action = {
                 content: {
                     text: "{{response}}",
                     action: "GENERATE_IMAGE",
-                    actionInput: "Surreal digital art interpretation of the conversation: {{any}}"
+                    actionInput:
+                        "Surreal digital art interpretation of the conversation: {{any}}",
                 },
             },
         ],
@@ -217,10 +221,10 @@ const imageGeneration: Action = {
                 content: {
                     text: "Here's an image of a cat",
                     action: "GENERATE_IMAGE",
-                    actionInput: "A cat in a surreal digital art style"
+                    actionInput: "A cat in a surreal digital art style",
                 },
             },
-        ]
+        ],
     ],
 } as Action;
 
